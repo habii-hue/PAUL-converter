@@ -15,7 +15,7 @@ import streamlit as st
 # 1. PAGE CONFIG & SKLAUNCHER FLUID UI
 # ==========================================
 st.set_page_config(
-    page_title="PAUL — Document Conversion Engine",
+    page_title="PAUL — PDF to Word Converter",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
@@ -31,7 +31,7 @@ st.markdown(
         height: 0px !important;
     }
 
-    /* Ambient SKlauncher background with subtle radial top glow */
+    /* Ambient SKlauncher background */
     html, body, [data-testid="stAppViewContainer"], .stApp {
         background-color: #090b10 !important;
         background-image: radial-gradient(circle at 50% -10%, rgba(225, 29, 72, 0.09), transparent 55%) !important;
@@ -44,9 +44,9 @@ st.markdown(
     }
 
     .block-container {
-        padding-top: 1.75rem !important;
+        padding-top: 2.2rem !important;
         padding-bottom: 3.5rem !important;
-        max-width: 1080px !important;
+        max-width: 1040px !important;
     }
 
     /* Smooth Keyframe Entrance for Tab Panels */
@@ -112,7 +112,7 @@ st.markdown(
         text-transform: uppercase;
     }
     .sk-subtitle {
-        font-size: 0.84rem;
+        font-size: 0.86rem;
         color: #94a3b8;
         margin: 0.35rem 0 0 0;
     }
@@ -120,20 +120,19 @@ st.markdown(
         background: rgba(11, 14, 20, 0.75);
         border: 1px solid rgba(255, 255, 255, 0.06);
         border-radius: 12px;
-        padding: 0.6rem 1rem;
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.72rem;
-        color: #64748b;
+        padding: 0.55rem 0.95rem;
+        font-size: 0.75rem;
+        color: #94a3b8;
         text-align: right;
-        line-height: 1.5;
+        line-height: 1.45;
     }
     .sk-sys-badge span {
-        color: #e2e8f0;
-        font-weight: 500;
+        color: #f1f5f9;
+        font-weight: 600;
     }
 
     /* ========================================================
-       TRUE ROUNDED PILL TABS (KILLS SQUARE BASEWEB BOXES)
+       TRUE ROUNDED PILL TABS
        ======================================================== */
     .stTabs [data-baseweb="tab-list"] {
         background-color: #10131c !important;
@@ -146,7 +145,6 @@ st.markdown(
         box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.45) !important;
     }
 
-    /* Remove Streamlit's red underline & bottom border completely */
     .stTabs [data-baseweb="tab-highlight"],
     .stTabs [data-baseweb="tab-border"] {
         display: none !important;
@@ -154,7 +152,6 @@ st.markdown(
         background: transparent !important;
     }
 
-    /* Individual Pill Button */
     .stTabs button[data-baseweb="tab"] {
         border-radius: 9999px !important;
         padding: 0.5rem 1.35rem !important;
@@ -178,14 +175,12 @@ st.markdown(
         transition: color 0.25s ease !important;
     }
 
-    /* Smooth Pill Hover */
     .stTabs button[data-baseweb="tab"]:hover {
         color: #f8fafc !important;
         background-color: rgba(255, 255, 255, 0.05) !important;
         transform: translateY(-1px) !important;
     }
 
-    /* Active Selected Pill */
     .stTabs button[data-baseweb="tab"][aria-selected="true"] {
         background: linear-gradient(135deg, rgba(225, 29, 72, 0.22) 0%, rgba(159, 18, 57, 0.16) 100%) !important;
         color: #ffffff !important;
@@ -201,7 +196,7 @@ st.markdown(
     }
 
     /* ========================================================
-       FILE UPLOADER DROPZONE (NO MUDDY BROWN BACKGROUND)
+       FILE UPLOADER DROPZONE
        ======================================================== */
     [data-testid="stFileUploader"] {
         margin-bottom: 1.15rem !important;
@@ -236,13 +231,13 @@ st.markdown(
     }
 
     /* ========================================================
-       MODE CARDS & TELEMETRY GRID
+       MODE CARDS & SUMMARY GRID
        ======================================================== */
     .mode-card {
         background: linear-gradient(180deg, rgba(19, 23, 34, 0.9) 0%, rgba(15, 18, 27, 0.9) 100%);
         border: 1px solid rgba(255, 255, 255, 0.06);
         border-radius: 16px;
-        padding: 1.25rem 1.5rem;
+        padding: 1.2rem 1.45rem;
         margin-bottom: 1.1rem;
         transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
     }
@@ -254,17 +249,17 @@ st.markdown(
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 0.4rem;
+        margin-bottom: 0.35rem;
     }
     .mode-card-title {
-        font-size: 0.95rem;
+        font-size: 0.96rem;
         font-weight: 600;
         color: #f8fafc;
         letter-spacing: -0.01em;
     }
     .mode-card-tag {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.7rem;
+        font-size: 0.72rem;
+        font-weight: 500;
         color: #cbd5e1;
         background: rgba(255, 255, 255, 0.05);
         padding: 0.2rem 0.65rem;
@@ -272,13 +267,13 @@ st.markdown(
         border: 1px solid rgba(255, 255, 255, 0.08);
     }
     .mode-card-desc {
-        font-size: 0.83rem;
-        color: #64748b;
+        font-size: 0.84rem;
+        color: #94a3b8;
         margin: 0;
         line-height: 1.45;
     }
 
-    /* Telemetry Cards */
+    /* Summary Cards */
     .telemetry-grid {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
@@ -299,16 +294,15 @@ st.markdown(
         box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.55);
     }
     .telemetry-label {
-        font-size: 0.68rem;
+        font-size: 0.7rem;
         font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: 0.06em;
+        letter-spacing: 0.05em;
         color: #64748b;
         margin-bottom: 0.3rem;
     }
     .telemetry-val {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.88rem;
+        font-size: 0.9rem;
         font-weight: 600;
         color: #f1f5f9;
         white-space: nowrap;
@@ -329,7 +323,6 @@ st.markdown(
         border-color: rgba(255, 255, 255, 0.18) !important;
     }
 
-    /* Primary Launch Button */
     .stButton > button[kind="primary"],
     .stDownloadButton > button[kind="primary"] {
         background: linear-gradient(135deg, #e11d48 0%, #be123c 100%) !important;
@@ -379,9 +372,8 @@ st.markdown(
         color: #f8fafc;
     }
     .deliverable-meta {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.74rem;
-        color: #64748b;
+        font-size: 0.78rem;
+        color: #94a3b8;
     }
 </style>
 """,
@@ -390,7 +382,7 @@ st.markdown(
 
 
 # ==========================================
-# 2. AUTONOMOUS ENGINE & PAGE RESOLVERS
+# 2. CONVERSION ENGINE & PAGE RESOLVERS
 # ==========================================
 HOST_CORES = multiprocessing.cpu_count()
 AUTO_MP_PAGE_THRESHOLD = 12
@@ -428,13 +420,13 @@ def compute_auto_allocation(
     strategy: str, num_pages: int
 ) -> tuple[bool, int, str]:
   if strategy != "CONTINUOUS":
-    return False, 1, "1 THREAD (DISCRETE INDEXING)"
+    return False, 1, "Standard"
 
   if num_pages >= AUTO_MP_PAGE_THRESHOLD and HOST_CORES > 1:
     optimal_cores = min(HOST_CORES, max(2, min(8, num_pages // 6)))
-    return True, optimal_cores, f"AUTO-PARALLEL ({optimal_cores} THREADS)"
+    return True, optimal_cores, "Fast Mode (Multi-Core)"
 
-  return False, 1, "1 THREAD (LOW-LATENCY SERIAL)"
+  return False, 1, "Standard"
 
 
 def resolve_target_pages(
@@ -448,22 +440,22 @@ def resolve_target_pages(
 ) -> tuple[str, int, int, list[int]]:
   non_seq_pills = non_seq_pills or []
 
-  if mode == "Full Document":
+  if mode == "All Pages":
     return "CONTINUOUS", 0, total_pages, list(range(total_pages))
 
-  elif mode == "Sequential Range":
+  elif mode == "Page Range":
     eff_end_1 = seq_end - 1 if exclusive_end else seq_end
     eff_end_1 = min(eff_end_1, total_pages)
     start_0 = max(0, seq_start - 1)
     end_0 = max(start_0, eff_end_1)
     return "CONTINUOUS", start_0, end_0, list(range(start_0, end_0))
 
-  elif mode == "Non-Sequential":
+  elif mode == "Specific Pages":
     combined_0 = set(p - 1 for p in non_seq_pills if 1 <= p <= total_pages)
     combined_0.update(parse_page_expression(non_seq_expr, total_pages))
     return "DISCRETE", 0, None, sorted(combined_0)
 
-  else:  # Hybrid
+  else:  # Custom Mix
     eff_end_1 = seq_end - 1 if exclusive_end else seq_end
     eff_end_1 = min(eff_end_1, total_pages)
     start_0 = max(0, seq_start - 1)
@@ -502,7 +494,7 @@ def execute_pdf2docx(
 
 
 # ==========================================
-# 3. SESSION STATE & TELEMETRY HELPERS
+# 3. SESSION STATE & SUMMARY HELPERS
 # ==========================================
 if "audit_logs" not in st.session_state:
   st.session_state.audit_logs = []
@@ -511,43 +503,43 @@ if "deliverables" not in st.session_state:
 
 
 def log_event(status: str, filename: str, details: str):
-  ts = datetime.now().strftime("%H:%M:%S.%f")[:-3]
-  st.session_state.audit_logs.append(
-      f"[{ts}] [{status.ljust(5)}] {filename} :: {details}"
-  )
+  ts = datetime.now().strftime("%H:%M:%S")
+  st.session_state.audit_logs.append(f"[{ts}] {status} — {filename}: {details}")
 
 
-def render_telemetry_strip(
+def render_summary_strip(
     queue_count: int, mode_label: str, pages_0: list[int], strategy: str
 ):
   pages_1 = [p + 1 for p in pages_0]
   if not queue_count:
-    scope_str = "AWAITING SOURCE"
-    compute_str = "AUTO-SCALING IDLE"
+    scope_str = "Waiting for PDF..."
+    compute_str = "Automatic"
   else:
     if len(pages_1) > 7:
-      scope_str = f"{pages_1[:3]} .. {pages_1[-2:]} ({len(pages_1)}p)"
+      scope_str = f"{len(pages_1)} pages selected"
     else:
-      scope_str = str(pages_1) if pages_1 else "EMPTY SET"
+      scope_str = (
+          ", ".join(map(str, pages_1)) if pages_1 else "No pages selected"
+      )
     _, _, compute_str = compute_auto_allocation(strategy, len(pages_0))
 
   st.markdown(
       f"""
         <div class="telemetry-grid">
             <div class="telemetry-cell">
-                <div class="telemetry-label">Queued Files</div>
-                <div class="telemetry-val">{queue_count} DOCUMENT(S)</div>
+                <div class="telemetry-label">Files Uploaded</div>
+                <div class="telemetry-val">{queue_count} File(s)</div>
             </div>
             <div class="telemetry-cell">
-                <div class="telemetry-label">Active Mode</div>
-                <div class="telemetry-val">{mode_label.upper()}</div>
+                <div class="telemetry-label">Mode</div>
+                <div class="telemetry-val">{mode_label}</div>
             </div>
             <div class="telemetry-cell">
-                <div class="telemetry-label">Target Pages (1-Based)</div>
+                <div class="telemetry-label">Pages to Convert</div>
                 <div class="telemetry-val">{scope_str}</div>
             </div>
             <div class="telemetry-cell">
-                <div class="telemetry-label">Autonomous Compute</div>
+                <div class="telemetry-label">Speed</div>
                 <div class="telemetry-val">{compute_str}</div>
             </div>
         </div>
@@ -567,9 +559,9 @@ def run_batch_pipeline(
     non_seq_expr: str = "",
 ):
   st.session_state.deliverables = []
-  progress_bar = st.progress(0, text="Preparing reconstruction pipeline...")
+  progress_bar = st.progress(0, text="Starting conversion...")
 
-  with st.status(f"Executing {mode} pipeline...", expanded=True) as status:
+  with st.status("Converting your PDF(s) to Word...", expanded=True) as status:
     total = len(uploaded_files)
     for idx, u_file in enumerate(uploaded_files, start=1):
       t0 = time.perf_counter()
@@ -589,25 +581,23 @@ def run_batch_pipeline(
 
       if not pages_0:
         log_event(
-            "SKIP",
+            "Skipped",
             u_file.name,
-            f"0 valid pages resolved (doc max={page_count})",
+            f"Selected pages are outside the document's {page_count} pages.",
         )
         st.warning(
-            f"[{idx}/{total}] Skipped {u_file.name} — no target pages within"
-            f" 1..{page_count}."
+            f"Skipped {u_file.name} — none of the selected pages exist in this"
+            " file."
         )
         continue
 
       use_mp, auto_cores, compute_desc = compute_auto_allocation(
           strategy, len(pages_0)
       )
-      pages_1 = [p + 1 for p in pages_0]
 
       st.write(
-          f"`[{idx}/{total}]` **{u_file.name}** — {len(pages_0)}/{page_count}"
-          f" pages `{pages_1[:8]}{'...' if len(pages_1) > 8 else ''}` •"
-          f" `{compute_desc}`"
+          f"Converting **{u_file.name}** ({len(pages_0)} of {page_count}"
+          " pages)..."
       )
 
       with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_in:
@@ -640,30 +630,31 @@ def run_batch_pipeline(
             "bytes": docx_bytes,
             "elapsed": dt,
             "size_kb": size_kb,
-            "pages": f"{len(pages_0)}/{page_count}",
-            "compute": compute_desc,
+            "pages": f"{len(pages_0)} of {page_count} pages",
         })
         log_event(
-            "OK",
+            "Done",
             u_file.name,
-            f"Mode={mode} | Compute={compute_desc} |"
-            f" Pages={len(pages_0)}/{page_count} | {size_kb}KB | {dt}s",
+            f"Saved as {out_name} ({len(pages_0)} pages, {size_kb} KB in"
+            f" {dt}s)",
         )
       except Exception as exc:
-        log_event("ERROR", u_file.name, str(exc))
-        st.error(f"Failed on {u_file.name}: {exc}")
+        log_event("Error", u_file.name, str(exc))
+        st.error(f"Could not convert {u_file.name}: {exc}")
       finally:
         if os.path.exists(tmp_in_path):
           os.remove(tmp_in_path)
         if os.path.exists(tmp_out_path):
           os.remove(tmp_out_path)
 
-      progress_bar.progress(idx / total, text=f"Processed {idx}/{total} files")
+      progress_bar.progress(
+          idx / total, text=f"Converted {idx} of {total} file(s)"
+      )
 
     status.update(
         label=(
-            "Pipeline finished"
-            f" ({len(st.session_state.deliverables)}/{total} converted)"
+            f"Finished! Converted {len(st.session_state.deliverables)} of"
+            f" {total} file(s)."
         ),
         state="complete",
         expanded=False,
@@ -671,21 +662,21 @@ def run_batch_pipeline(
 
 
 # ==========================================
-# 4. SKLAUNCHER HEADER & PILL NAVIGATION
+# 4. HEADER & SIMPLE NAVIGATION
 # ==========================================
 st.markdown(
-    f"""
+    """
     <div class="sk-header">
         <div>
             <div class="sk-brand">
                 <h1 class="sk-title">PAUL</h1>
-                <span class="sk-pill">FITZ → OPENXML</span>
+                <span class="sk-pill">PDF to Word</span>
             </div>
-            <p class="sk-subtitle">Page Analyzer & Universal Layout Reconstruction Engine</p>
+            <p class="sk-subtitle">Fast, clean PDF to editable Word (.docx) converter</p>
         </div>
         <div class="sk-sys-badge">
-            SCHEDULER: <span>AUTONOMOUS MULTI-CORE ({HOST_CORES}T)</span><br>
-            THRESHOLD: <span>≥ {AUTO_MP_PAGE_THRESHOLD} PAGES → PARALLEL</span>
+            Speed Boost: <span>Automatic</span><br>
+            Format: <span>Word (.docx)</span>
         </div>
     </div>
     """,
@@ -693,17 +684,17 @@ st.markdown(
 )
 
 nav_workspace, nav_inspector, nav_telemetry = st.tabs([
-    "Conversion Workspace",
-    "Page Index Inspector",
-    "Audit Telemetry",
+    "Convert",
+    "Page Preview",
+    "Activity Log",
 ])
 
 # ------------------------------------------
-# TOP TAB 1: CONVERSION WORKSPACE
+# TOP TAB 1: CONVERT
 # ------------------------------------------
 with nav_workspace:
   uploaded_files = st.file_uploader(
-      "Drop PDF files to queue for reconstruction",
+      "Upload PDF files",
       type=["pdf"],
       accept_multiple_files=True,
       label_visibility="collapsed",
@@ -720,54 +711,54 @@ with nav_workspace:
         file_page_counts[uf.name] = len(doc)
     max_pages = max(file_page_counts.values())
 
-  # --- NESTED CAPSULE PILL TABS FOR PAGE SELECTION MODES ---
+  # --- USER-FRIENDLY MODE TABS ---
   mode_tab_full, mode_tab_seq, mode_tab_nonseq, mode_tab_hybrid = st.tabs([
-      "Full Document",
-      "Sequential Range",
-      "Non-Sequential Pages",
-      "Hybrid Selection",
+      "All Pages",
+      "Page Range",
+      "Specific Pages",
+      "Custom Mix",
   ])
 
-  # === MODE TAB 1: FULL DOCUMENT ===
+  # === MODE TAB 1: ALL PAGES ===
   with mode_tab_full:
     st.markdown(
         """
             <div class="mode-card">
                 <div class="mode-card-header">
-                    <span class="mode-card-title">Complete Document Reconstruction</span>
-                    <span class="mode-card-tag">CONTINUOUS [1 .. N]</span>
+                    <span class="mode-card-title">Convert Entire PDF</span>
+                    <span class="mode-card-tag">All Pages</span>
                 </div>
                 <p class="mode-card-desc">
-                    Converts every page from start to finish. Automatically scales across parallel CPU threads when processing documents with 12 or more pages.
+                    Converts every page in your PDF into an editable Word document.
                 </p>
             </div>
             """,
         unsafe_allow_html=True,
     )
 
-    strat, _, _, preview_p0 = resolve_target_pages("Full Document", max_pages)
-    render_telemetry_strip(queue_count, "Full Document", preview_p0, strat)
+    strat, _, _, preview_p0 = resolve_target_pages("All Pages", max_pages)
+    render_summary_strip(queue_count, "All Pages", preview_p0, strat)
 
     if st.button(
-        "Launch Full Document Reconstruction",
+        "Convert to Word (.docx)",
         key="btn_launch_full",
         type="primary",
         use_container_width=True,
         disabled=not queue_count,
     ):
-      run_batch_pipeline(uploaded_files, file_page_counts, mode="Full Document")
+      run_batch_pipeline(uploaded_files, file_page_counts, mode="All Pages")
 
-  # === MODE TAB 2: SEQUENTIAL RANGE ===
+  # === MODE TAB 2: PAGE RANGE ===
   with mode_tab_seq:
     st.markdown(
         """
             <div class="mode-card">
                 <div class="mode-card-header">
-                    <span class="mode-card-title">Sequential Contiguous Slice</span>
-                    <span class="mode-card-tag">CONTINUOUS [START .. END]</span>
+                    <span class="mode-card-title">Convert a Page Range</span>
+                    <span class="mode-card-tag">From – To</span>
                 </div>
                 <p class="mode-card-desc">
-                    Extracts a continuous block of pages. Supports inclusive bounds or Python-style exclusive end bounds with automatic multi-core scaling.
+                    Extracts a continuous set of pages from your starting page to your ending page.
                 </p>
             </div>
             """,
@@ -777,7 +768,7 @@ with nav_workspace:
     sc1, sc2, sc3 = st.columns([1, 1, 1.2])
     with sc1:
       seq_start = st.number_input(
-          "Start Page (1-based)",
+          "From Page",
           min_value=1,
           max_value=max_pages,
           value=1,
@@ -787,7 +778,7 @@ with nav_workspace:
     with sc2:
       default_seq_end = min(5, max_pages) if uploaded_files else 5
       seq_end = st.number_input(
-          "End Page",
+          "To Page",
           min_value=1,
           max_value=max_pages,
           value=max(seq_start, default_seq_end),
@@ -797,23 +788,23 @@ with nav_workspace:
     with sc3:
       st.write("")
       seq_excl = st.checkbox(
-          "Exclusive End Bound (`[Start .. End-1]`)",
+          "Exclude last page",
           value=False,
           key="seq_only_excl",
-          help="Stops immediately before End Page.",
+          help="If checked, conversion stops right before the 'To Page'.",
       )
 
     strat, _, _, preview_p0 = resolve_target_pages(
-        "Sequential Range",
+        "Page Range",
         max_pages,
         seq_start=seq_start,
         seq_end=seq_end,
         exclusive_end=seq_excl,
     )
-    render_telemetry_strip(queue_count, "Sequential Range", preview_p0, strat)
+    render_summary_strip(queue_count, "Page Range", preview_p0, strat)
 
     if st.button(
-        "Launch Sequential Reconstruction",
+        "Convert to Word (.docx)",
         key="btn_launch_seq",
         type="primary",
         use_container_width=True,
@@ -822,23 +813,23 @@ with nav_workspace:
       run_batch_pipeline(
           uploaded_files,
           file_page_counts,
-          mode="Sequential Range",
+          mode="Page Range",
           seq_start=seq_start,
           seq_end=seq_end,
           exclusive_end=seq_excl,
       )
 
-  # === MODE TAB 3: NON-SEQUENTIAL PAGES ===
+  # === MODE TAB 3: SPECIFIC PAGES ===
   with mode_tab_nonseq:
     st.markdown(
         """
             <div class="mode-card">
                 <div class="mode-card-header">
-                    <span class="mode-card-title">Discrete Non-Sequential Page Picker</span>
-                    <span class="mode-card-tag">DISCRETE [INDEX ARRAY]</span>
+                    <span class="mode-card-title">Pick Specific Pages</span>
+                    <span class="mode-card-tag">Custom Pages</span>
                 </div>
                 <p class="mode-card-desc">
-                    Cherry-pick individual non-adjacent pages using the interactive tag selector or comma-separated expressions.
+                    Choose individual pages to convert by selecting them from the list or typing page numbers.
                 </p>
             </div>
             """,
@@ -852,29 +843,29 @@ with nav_workspace:
           [1, 3] if max_pages >= 3 else ([1] if max_pages >= 1 else [])
       )
       ns_pills = st.multiselect(
-          "Interactive Page Tags",
+          "Select pages",
           options=pill_options,
           default=default_pills,
           key="ns_only_pills",
       )
     with nc2:
       ns_expr = st.text_input(
-          "Custom Page Expression",
+          "Or type pages (e.g. 5, 8, 10-12)",
           value="",
-          placeholder="e.g. 5, 9, 12-15",
+          placeholder="e.g. 5, 8, 10-12",
           key="ns_only_expr",
       )
 
     strat, _, _, preview_p0 = resolve_target_pages(
-        "Non-Sequential",
+        "Specific Pages",
         max_pages,
         non_seq_pills=ns_pills,
         non_seq_expr=ns_expr,
     )
-    render_telemetry_strip(queue_count, "Non-Sequential", preview_p0, strat)
+    render_summary_strip(queue_count, "Specific Pages", preview_p0, strat)
 
     if st.button(
-        "Launch Non-Sequential Reconstruction",
+        "Convert to Word (.docx)",
         key="btn_launch_nonseq",
         type="primary",
         use_container_width=True,
@@ -883,22 +874,22 @@ with nav_workspace:
       run_batch_pipeline(
           uploaded_files,
           file_page_counts,
-          mode="Non-Sequential",
+          mode="Specific Pages",
           non_seq_pills=ns_pills,
           non_seq_expr=ns_expr,
       )
 
-  # === MODE TAB 4: HYBRID SELECTION ===
+  # === MODE TAB 4: CUSTOM MIX ===
   with mode_tab_hybrid:
     st.markdown(
         """
             <div class="mode-card">
                 <div class="mode-card-header">
-                    <span class="mode-card-title">Hybrid Composite Selection</span>
-                    <span class="mode-card-tag">COMPOSITE [RANGE ∪ INDICES]</span>
+                    <span class="mode-card-title">Combine Range & Extra Pages</span>
+                    <span class="mode-card-tag">Range + Extra Pages</span>
                 </div>
                 <p class="mode-card-desc">
-                    Merges a base sequential range with additional non-sequential outlier pages into a single deduplicated conversion pass.
+                    Convert a main page range and include extra individual pages in a single Word file.
                 </p>
             </div>
             """,
@@ -908,7 +899,7 @@ with nav_workspace:
     hc1, hc2, hc3 = st.columns([1, 1, 1.2])
     with hc1:
       hyb_start = st.number_input(
-          "Base Range Start",
+          "From Page",
           min_value=1,
           max_value=max_pages,
           value=1,
@@ -918,7 +909,7 @@ with nav_workspace:
     with hc2:
       default_hyb_end = min(3, max_pages) if uploaded_files else 3
       hyb_end = st.number_input(
-          "Base Range End",
+          "To Page",
           min_value=1,
           max_value=max_pages,
           value=max(hyb_start, default_hyb_end),
@@ -928,7 +919,7 @@ with nav_workspace:
     with hc3:
       st.write("")
       hyb_excl = st.checkbox(
-          "Exclusive End Bound (`[Start .. End-1]`)",
+          "Exclude last page",
           value=False,
           key="hyb_excl",
       )
@@ -936,21 +927,21 @@ with nav_workspace:
     hnc1, hnc2 = st.columns([1.4, 1])
     with hnc1:
       hyb_pills = st.multiselect(
-          "Additional Non-Sequential Pages",
+          "Extra pages to include",
           options=list(range(1, min(max_pages, 200) + 1)),
           default=[5] if max_pages >= 5 else [],
           key="hyb_pills",
       )
     with hnc2:
       hyb_expr = st.text_input(
-          "Additional Page / Sub-Range Expression",
+          "Or type extra pages (e.g. 8, 11-13)",
           value="",
           placeholder="e.g. 8, 11-13",
           key="hyb_expr",
       )
 
     strat, _, _, preview_p0 = resolve_target_pages(
-        "Hybrid",
+        "Custom Mix",
         max_pages,
         seq_start=hyb_start,
         seq_end=hyb_end,
@@ -958,10 +949,10 @@ with nav_workspace:
         non_seq_pills=hyb_pills,
         non_seq_expr=hyb_expr,
     )
-    render_telemetry_strip(queue_count, "Hybrid Selection", preview_p0, strat)
+    render_summary_strip(queue_count, "Custom Mix", preview_p0, strat)
 
     if st.button(
-        "Launch Hybrid Reconstruction",
+        "Convert to Word (.docx)",
         key="btn_launch_hybrid",
         type="primary",
         use_container_width=True,
@@ -970,7 +961,7 @@ with nav_workspace:
       run_batch_pipeline(
           uploaded_files,
           file_page_counts,
-          mode="Hybrid",
+          mode="Custom Mix",
           seq_start=hyb_start,
           seq_end=hyb_end,
           exclusive_end=hyb_excl,
@@ -978,10 +969,10 @@ with nav_workspace:
           non_seq_expr=hyb_expr,
       )
 
-  # --- DELIVERABLES MANIFEST ---
+  # --- DOWNLOAD READY FILES ---
   if st.session_state.deliverables:
     st.divider()
-    st.markdown("##### Reconstructed Output Manifest")
+    st.markdown("##### Ready to Download")
 
     if len(st.session_state.deliverables) > 1:
       zip_buf = io.BytesIO()
@@ -991,11 +982,11 @@ with nav_workspace:
 
       st.download_button(
           label=(
-              "Download Batch Archive (.ZIP —"
-              f" {len(st.session_state.deliverables)} files)"
+              f"Download All as ZIP ({len(st.session_state.deliverables)}"
+              " files)"
           ),
           data=zip_buf.getvalue(),
-          file_name="PAUL_Batch_Output.zip",
+          file_name="Converted_Word_Files.zip",
           mime="application/zip",
           type="primary",
           use_container_width=True,
@@ -1008,14 +999,14 @@ with nav_workspace:
             f"""
                     <div class="deliverable-row">
                         <span class="deliverable-name">{item['name']}</span>
-                        <span class="deliverable-meta">PAGES: {item['pages']} &nbsp;•&nbsp; {item['compute']} &nbsp;•&nbsp; {item['size_kb']} KB &nbsp;•&nbsp; {item['elapsed']}s</span>
+                        <span class="deliverable-meta">{item['pages']} &nbsp;•&nbsp; {item['size_kb']} KB &nbsp;•&nbsp; {item['elapsed']}s</span>
                     </div>
                     """,
             unsafe_allow_html=True,
         )
       with col_btn:
         st.download_button(
-            label="Export DOCX",
+            label="Download",
             data=item["bytes"],
             file_name=item["name"],
             mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -1024,41 +1015,34 @@ with nav_workspace:
         )
 
 # ------------------------------------------
-# TOP TAB 2: PAGE INDEX INSPECTOR
+# TOP TAB 2: PAGE PREVIEW
 # ------------------------------------------
 with nav_inspector:
   if not uploaded_files:
-    st.caption(
-        "Queue one or more PDF files in the Conversion Workspace to inspect"
-        " autonomous thread allocation and page indices."
-    )
+    st.caption("Upload a PDF file first to see a quick summary of its pages.")
   else:
     inspector_rows = []
     for uf in uploaded_files:
       total_p = file_page_counts[uf.name]
-      use_mp_auto, cores_auto, desc_auto = compute_auto_allocation(
-          "CONTINUOUS", total_p
-      )
+      _, _, desc_auto = compute_auto_allocation("CONTINUOUS", total_p)
       inspector_rows.append({
-          "Source PDF": uf.name,
+          "File Name": uf.name,
           "Total Pages": total_p,
-          "Full-Doc Auto Compute": desc_auto,
-          "Worker Allocation": f"{cores_auto} Process(es)",
-          "0-Based Bounds": f"start=0, end={total_p}",
+          "Conversion Speed": desc_auto,
       })
     st.dataframe(inspector_rows, use_container_width=True, hide_index=True)
 
 # ------------------------------------------
-# TOP TAB 3: AUDIT TELEMETRY
+# TOP TAB 3: ACTIVITY LOG
 # ------------------------------------------
 with nav_telemetry:
   if st.session_state.audit_logs:
-    st.code("\n".join(st.session_state.audit_logs), language="log")
-    if st.button("Purge Session Telemetry"):
+    st.code("\n".join(st.session_state.audit_logs), language="text")
+    if st.button("Clear Log"):
       st.session_state.audit_logs = []
       st.rerun()
   else:
-    st.caption("No conversion jobs recorded in current session.")
+    st.caption("No conversions run yet.")
 
 
 # ==========================================
