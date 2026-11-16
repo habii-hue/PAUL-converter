@@ -132,6 +132,42 @@ st.markdown(
     }
 
     /* ========================================================
+       DETECTED PAGES PILL BAR
+       ======================================================== */
+    .detector-bar {
+        background-color: #11151f;
+        border: 1px solid rgba(244, 63, 94, 0.28);
+        border-radius: 12px;
+        padding: 0.65rem 1.1rem;
+        margin-bottom: 1.15rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    .detector-label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #f8fafc;
+    }
+    .detector-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.45rem;
+    }
+    .detector-chip {
+        background: rgba(225, 29, 72, 0.14);
+        border: 1px solid rgba(225, 29, 72, 0.32);
+        color: #fda4af;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.74rem;
+        font-weight: 500;
+        padding: 0.2rem 0.65rem;
+        border-radius: 9999px;
+    }
+
+    /* ========================================================
        TRUE ROUNDED PILL TABS
        ======================================================== */
     .stTabs [data-baseweb="tab-list"] {
@@ -199,7 +235,7 @@ st.markdown(
        FILE UPLOADER DROPZONE
        ======================================================== */
     [data-testid="stFileUploader"] {
-        margin-bottom: 1.15rem !important;
+        margin-bottom: 0.85rem !important;
     }
     [data-testid="stFileUploaderDropzone"] {
         background-color: #11151f !important;
@@ -390,7 +426,7 @@ AUTO_MP_PAGE_THRESHOLD = 12
 
 def parse_page_expression(expr: str, max_pages: int) -> list[int]:
   pages_set = set()
-  if not expr or not expr.strip():
+  if not expr or not expr.strip() or max_pages <= 0:
     return []
 
   tokens = [t.strip() for t in expr.split(",") if t.strip()]
@@ -438,6 +474,9 @@ def resolve_target_pages(
     non_seq_pills: list[int] = None,
     non_seq_expr: str = "",
 ) -> tuple[str, int, int, list[int]]:
+  if total_pages <= 0:
+    return "CONTINUOUS", 0, 0, []
+
   non_seq_pills = non_seq_pills or []
 
   if mode == "All Pages":
@@ -508,15 +547,21 @@ def log_event(status: str, filename: str, details: str):
 
 
 def render_summary_strip(
-    queue_count: int, mode_label: str, pages_0: list[int], strategy: str
+    queue_count: int,
+    detected_max_pages: int,
+    mode_label: str,
+    pages_0: list[int],
+    strategy: str,
 ):
   pages_1 = [p + 1 for p in pages_0]
   if not queue_count:
-    scope_str = "Waiting for PDF..."
+    files_str = "0 File(s)"
+    scope_str = "Upload a PDF first"
     compute_str = "Automatic"
   else:
+    files_str = f"{queue_count} File(s) • {detected_max_pages} Page(s)"
     if len(pages_1) > 7:
-      scope_str = f"{len(pages_1)} pages selected"
+      scope_str = f"{len(pages_1)} of {detected_max_pages} pages"
     else:
       scope_str = (
           ", ".join(map(str, pages_1)) if pages_1 else "No pages selected"
@@ -527,8 +572,8 @@ def render_summary_strip(
       f"""
         <div class="telemetry-grid">
             <div class="telemetry-cell">
-                <div class="telemetry-label">Files Uploaded</div>
-                <div class="telemetry-val">{queue_count} File(s)</div>
+                <div class="telemetry-label">Detected PDF</div>
+                <div class="telemetry-val">{files_str}</div>
             </div>
             <div class="telemetry-cell">
                 <div class="telemetry-label">Mode</div>
@@ -591,9 +636,7 @@ def run_batch_pipeline(
         )
         continue
 
-      use_mp, auto_cores, compute_desc = compute_auto_allocation(
-          strategy, len(pages_0)
-      )
+      use_mp, auto_cores, _ = compute_auto_allocation(strategy, len(pages_0))
 
       st.write(
           f"Converting **{u_file.name}** ({len(pages_0)} of {page_count}"
@@ -675,7 +718,7 @@ st.markdown(
             <p class="sk-subtitle">Fast, clean PDF to editable Word (.docx) converter</p>
         </div>
         <div class="sk-sys-badge">
-            Speed Boost: <span>Automatic</span><br>
+            Page Detector: <span>Active</span><br>
             Format: <span>Word (.docx)</span>
         </div>
     </div>
@@ -700,16 +743,47 @@ with nav_workspace:
       label_visibility="collapsed",
   )
 
+  # --- AUTOMATIC PAGE DETECTOR ---
   queue_count = len(uploaded_files) if uploaded_files else 0
-  max_pages = 500
   file_page_counts = {}
+  detected_max_pages = 0
 
   if uploaded_files:
+    chips_html = ""
     for uf in uploaded_files:
       uf.seek(0)
       with fitz.open(stream=uf.read(), filetype="pdf") as doc:
-        file_page_counts[uf.name] = len(doc)
-    max_pages = max(file_page_counts.values())
+        p_len = len(doc)
+        file_page_counts[uf.name] = p_len
+      chips_html += (
+          f'<span class="detector-chip">{uf.name} • {p_len}'
+          f' {"Page" if p_len == 1 else "Pages"}</span>'
+      )
+
+    detected_max_pages = max(file_page_counts.values())
+
+    st.markdown(
+        f"""
+            <div class="detector-bar">
+                <span class="detector-label">Page Detector — Only showing pages available in your file:</span>
+                <div class="detector-chips">{chips_html}</div>
+            </div>
+            """,
+        unsafe_allow_html=True,
+    )
+
+  # --- Strictly bound controls to the detected page count ---
+  bound_max = detected_max_pages if queue_count > 0 else 1
+  exact_page_options = (
+      list(range(1, detected_max_pages + 1)) if queue_count > 0 else []
+  )
+
+  # Clean up any previously selected pages in session_state that exceed the newly uploaded PDF's page count
+  for state_key in ["ns_only_pills", "hyb_pills"]:
+    if state_key in st.session_state:
+      st.session_state[state_key] = [
+          p for p in st.session_state[state_key] if 1 <= p <= detected_max_pages
+      ]
 
   # --- USER-FRIENDLY MODE TABS ---
   mode_tab_full, mode_tab_seq, mode_tab_nonseq, mode_tab_hybrid = st.tabs([
@@ -736,8 +810,12 @@ with nav_workspace:
         unsafe_allow_html=True,
     )
 
-    strat, _, _, preview_p0 = resolve_target_pages("All Pages", max_pages)
-    render_summary_strip(queue_count, "All Pages", preview_p0, strat)
+    strat, _, _, preview_p0 = resolve_target_pages(
+        "All Pages", detected_max_pages
+    )
+    render_summary_strip(
+        queue_count, detected_max_pages, "All Pages", preview_p0, strat
+    )
 
     if st.button(
         "Convert to Word (.docx)",
@@ -768,40 +846,43 @@ with nav_workspace:
     sc1, sc2, sc3 = st.columns([1, 1, 1.2])
     with sc1:
       seq_start = st.number_input(
-          "From Page",
+          f"From Page (Max: {detected_max_pages})"
+          if queue_count
+          else "From Page",
           min_value=1,
-          max_value=max_pages,
+          max_value=bound_max,
           value=1,
           step=1,
-          key="seq_only_start",
+          disabled=not queue_count,
       )
     with sc2:
-      default_seq_end = min(5, max_pages) if uploaded_files else 5
       seq_end = st.number_input(
-          "To Page",
+          f"To Page (Max: {detected_max_pages})" if queue_count else "To Page",
           min_value=1,
-          max_value=max_pages,
-          value=max(seq_start, default_seq_end),
+          max_value=bound_max,
+          value=bound_max,
           step=1,
-          key="seq_only_end",
+          disabled=not queue_count,
       )
     with sc3:
       st.write("")
       seq_excl = st.checkbox(
           "Exclude last page",
           value=False,
-          key="seq_only_excl",
+          disabled=not queue_count,
           help="If checked, conversion stops right before the 'To Page'.",
       )
 
     strat, _, _, preview_p0 = resolve_target_pages(
         "Page Range",
-        max_pages,
+        detected_max_pages,
         seq_start=seq_start,
         seq_end=seq_end,
         exclusive_end=seq_excl,
     )
-    render_summary_strip(queue_count, "Page Range", preview_p0, strat)
+    render_summary_strip(
+        queue_count, detected_max_pages, "Page Range", preview_p0, strat
+    )
 
     if st.button(
         "Convert to Word (.docx)",
@@ -829,7 +910,7 @@ with nav_workspace:
                     <span class="mode-card-tag">Custom Pages</span>
                 </div>
                 <p class="mode-card-desc">
-                    Choose individual pages to convert by selecting them from the list or typing page numbers.
+                    Choose individual pages from your uploaded PDF (only pages that exist in your file are shown).
                 </p>
             </div>
             """,
@@ -838,31 +919,39 @@ with nav_workspace:
 
     nc1, nc2 = st.columns([1.4, 1])
     with nc1:
-      pill_options = list(range(1, min(max_pages, 200) + 1))
-      default_pills = (
-          [1, 3] if max_pages >= 3 else ([1] if max_pages >= 1 else [])
-      )
       ns_pills = st.multiselect(
-          "Select pages",
-          options=pill_options,
-          default=default_pills,
+          f"Select pages (1 to {detected_max_pages} available)"
+          if queue_count
+          else "Select pages (Upload a PDF first)",
+          options=exact_page_options,
+          placeholder="Click to pick pages..."
+          if queue_count
+          else "Upload a PDF above to detect pages",
+          disabled=not queue_count,
           key="ns_only_pills",
       )
     with nc2:
       ns_expr = st.text_input(
-          "Or type pages (e.g. 5, 8, 10-12)",
+          f"Or type pages (1–{detected_max_pages})"
+          if queue_count
+          else "Or type pages",
           value="",
-          placeholder="e.g. 5, 8, 10-12",
+          placeholder=f"e.g. 1, {min(3, bound_max)}"
+          if queue_count
+          else "Upload a PDF first",
+          disabled=not queue_count,
           key="ns_only_expr",
       )
 
     strat, _, _, preview_p0 = resolve_target_pages(
         "Specific Pages",
-        max_pages,
+        detected_max_pages,
         non_seq_pills=ns_pills,
         non_seq_expr=ns_expr,
     )
-    render_summary_strip(queue_count, "Specific Pages", preview_p0, strat)
+    render_summary_strip(
+        queue_count, detected_max_pages, "Specific Pages", preview_p0, strat
+    )
 
     if st.button(
         "Convert to Word (.docx)",
@@ -899,21 +988,24 @@ with nav_workspace:
     hc1, hc2, hc3 = st.columns([1, 1, 1.2])
     with hc1:
       hyb_start = st.number_input(
-          "From Page",
+          f"From Page (Max: {detected_max_pages})"
+          if queue_count
+          else "From Page",
           min_value=1,
-          max_value=max_pages,
+          max_value=bound_max,
           value=1,
           step=1,
+          disabled=not queue_count,
           key="hyb_start",
       )
     with hc2:
-      default_hyb_end = min(3, max_pages) if uploaded_files else 3
       hyb_end = st.number_input(
-          "To Page",
+          f"To Page (Max: {detected_max_pages})" if queue_count else "To Page",
           min_value=1,
-          max_value=max_pages,
-          value=max(hyb_start, default_hyb_end),
+          max_value=bound_max,
+          value=min(3, bound_max),
           step=1,
+          disabled=not queue_count,
           key="hyb_end",
       )
     with hc3:
@@ -921,35 +1013,46 @@ with nav_workspace:
       hyb_excl = st.checkbox(
           "Exclude last page",
           value=False,
+          disabled=not queue_count,
           key="hyb_excl",
       )
 
     hnc1, hnc2 = st.columns([1.4, 1])
     with hnc1:
       hyb_pills = st.multiselect(
-          "Extra pages to include",
-          options=list(range(1, min(max_pages, 200) + 1)),
-          default=[5] if max_pages >= 5 else [],
+          f"Extra pages to include (1 to {detected_max_pages})"
+          if queue_count
+          else "Extra pages to include",
+          options=exact_page_options,
+          placeholder="Click to pick extra pages..."
+          if queue_count
+          else "Upload a PDF first",
+          disabled=not queue_count,
           key="hyb_pills",
       )
     with hnc2:
       hyb_expr = st.text_input(
-          "Or type extra pages (e.g. 8, 11-13)",
+          f"Or type extra pages (1–{detected_max_pages})"
+          if queue_count
+          else "Or type extra pages",
           value="",
-          placeholder="e.g. 8, 11-13",
+          placeholder="e.g. 5, 7" if queue_count else "Upload a PDF first",
+          disabled=not queue_count,
           key="hyb_expr",
       )
 
     strat, _, _, preview_p0 = resolve_target_pages(
         "Custom Mix",
-        max_pages,
+        detected_max_pages,
         seq_start=hyb_start,
         seq_end=hyb_end,
         exclusive_end=hyb_excl,
         non_seq_pills=hyb_pills,
         non_seq_expr=hyb_expr,
     )
-    render_summary_strip(queue_count, "Custom Mix", preview_p0, strat)
+    render_summary_strip(
+        queue_count, detected_max_pages, "Custom Mix", preview_p0, strat
+    )
 
     if st.button(
         "Convert to Word (.docx)",
@@ -1019,7 +1122,7 @@ with nav_workspace:
 # ------------------------------------------
 with nav_inspector:
   if not uploaded_files:
-    st.caption("Upload a PDF file first to see a quick summary of its pages.")
+    st.caption("Upload a PDF file first to see its detected page count.")
   else:
     inspector_rows = []
     for uf in uploaded_files:
@@ -1027,7 +1130,7 @@ with nav_inspector:
       _, _, desc_auto = compute_auto_allocation("CONTINUOUS", total_p)
       inspector_rows.append({
           "File Name": uf.name,
-          "Total Pages": total_p,
+          "Detected Pages": f"1 to {total_p} ({total_p} total)",
           "Conversion Speed": desc_auto,
       })
     st.dataframe(inspector_rows, use_container_width=True, hide_index=True)
